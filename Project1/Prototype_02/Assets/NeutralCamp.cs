@@ -2,28 +2,54 @@
 using System.Collections;
 
 public class NeutralCamp : MonoBehaviour {
-    float timeToComplete = 1.0f;
+    public float timeToComplete;
+    public int resourceAmount;
+    public float cooldown;
+    float cooldownTimer = 0.0f;
+    bool isOccupied = false;
+    public bool hasResources = false;
+
     // Use this for initialization
     void Start ()
     {
-        //collider = gameObject.GetComponent<Collider2D>();
-        EventManager.CollectionEvent += OnCollectOrb;
+
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if (isOccupied && !hasResources)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 0, 0, 0.5f);
+        }
+        if (!isOccupied && !hasResources)
+        {
+            if (cooldownTimer < cooldown)
+            {
+                cooldownTimer += Time.deltaTime;
+            }
+            else if (cooldownTimer >= cooldown && !isOccupied)
+            {
+                gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+                cooldownTimer = 0.0f;
+                hasResources = true;
+            }
+        }
 	}
 
-    void OnCollisionStay2D(Collision2D col)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (col.gameObject.name == "Player")
+        if (other.gameObject != null)
         {
-            print(true);
+            isOccupied = true;
         }
     }
 
-    void OnCollectOrb()
+    void OnTriggerExit2D(Collider2D other)
     {
+        if (other.gameObject != null)
+        {
+            isOccupied = false;
+        }
     }
 }

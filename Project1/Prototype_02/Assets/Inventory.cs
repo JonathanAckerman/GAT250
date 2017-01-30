@@ -2,15 +2,31 @@
 using System.Collections;
 
 public class Inventory : MonoBehaviour {
-    int total;
+    int total = 0;
 
 	// Use this for initialization
 	void Start ()
     {
-        total = 0;
 	}
+
+    void OnEnable()
+    {
+        CharacterController.CampCallbacks += IncreaseTotal;
+    }
+
+    void OnDisable()
+    {
+        CharacterController.CampCallbacks -= IncreaseTotal;
+    }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 	}
+
+    void IncreaseTotal(int amount)
+    {
+        total += amount;
+        print(total);
+    }
 }
