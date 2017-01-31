@@ -36,6 +36,14 @@ public class CharacterController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        ///////////
+        // Quit
+        ///////////
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+
         ///////////////////////
         // Movement
         //////////////////////
