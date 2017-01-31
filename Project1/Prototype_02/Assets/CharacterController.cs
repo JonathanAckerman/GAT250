@@ -8,8 +8,13 @@ public class CharacterController : MonoBehaviour {
     float totalDist = 0.0f;
     float curDist = 0.0f;
     bool arrived = true;
-    bool attackOrderActive = false;
+    public bool attackOrderActive = false;
     public Camera cam;
+    int score = 0;
+
+    public GameObject bulletPrefab;
+    public Transform bulletSpawn;
+    public float bulletMoveSpeed;
 
     bool isInsideCamp = false;
     float collectionTimer = 0.0f;
@@ -27,6 +32,9 @@ public class CharacterController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        ///////////////////////
+        // Movement
+        //////////////////////
         // Listen for right clicks and set the destination and move increment
         Vector3 curPos = gameObject.GetComponent<Transform>().position;
         if (Input.GetMouseButtonDown(1))
@@ -52,18 +60,20 @@ public class CharacterController : MonoBehaviour {
             arrived = true;
             curDist = 0.0f;
         }
+
+        ////////////////////////
         // Attack
+        /////////////////////////
         if (Input.GetKeyDown(KeyCode.A))
         {
             attackOrderActive = true;
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 0, 0, 1);
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0.2f, 0.2f, 0.9f, 1);
         }
         if (attackOrderActive && Input.GetMouseButtonDown(0))
         {
             Vector3 target = cam.ScreenToWorldPoint(Input.mousePosition);
             ShootAtTarget(target);
             attackOrderActive = false;
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
         }
 
         // Neutral Camp Logic
@@ -72,7 +82,7 @@ public class CharacterController : MonoBehaviour {
             if (CurCamp.hasResources)
             {
                 collectionTimer += Time.deltaTime;
-                print(collectionTimer);
+                //print(collectionTimer);
                 if (collectionTimer >= CurCamp.timeToComplete)
                 {
                     CurCamp.hasResources = false;
@@ -86,14 +96,19 @@ public class CharacterController : MonoBehaviour {
     ////////////////
     /// Shooting 
     ////////////////
-    public GameObject bulletPrefab;
-    public Transform bulletSpawn;
-    public float bulletMoveSpeed;
     void ShootAtTarget(Vector3 target)
     {
-        GameObject bullet = (GameObject)Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
-        bullet.GetComponent<Rigidbody2D>().velocity = target.normalized;
-        //print(bullet.GetComponent<Rigidbody2D>().velocity);
+        Inventory inventory = gameObject.GetComponent<Inventory>();
+        int curTotal = inventory.GetTotal();
+        if (curTotal > 0)
+        {
+            GameObject bullet = (GameObject)Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+            Vector3 dir = target - bulletSpawn.position;
+            dir.z = bulletSpawn.position.z;
+            bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletMoveSpeed;
+            inventory.ShotOrb();
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+        }
     }
 
     ////////////////////////////
@@ -103,7 +118,6 @@ public class CharacterController : MonoBehaviour {
     {
         if (other.gameObject.name == "Neutral Camp")
         {
-            print("STARTING");
             CurCamp = other.gameObject.GetComponent<NeutralCamp>();
             isInsideCamp = true;
         }
@@ -113,9 +127,18 @@ public class CharacterController : MonoBehaviour {
     {
         if (other.gameObject.name == "Neutral Camp")
         {
-            print("RESETTING");
             isInsideCamp = false;
             collectionTimer = 0.0f;
         }
+    }
+
+    public void MadeShot()
+    {
+        score += 1;
+    }
+
+    public int GetScore()
+    {
+        return score;
     }
 }

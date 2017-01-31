@@ -22,6 +22,10 @@ public class NeutralCamp : MonoBehaviour {
         {
             gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 0, 0, 0.5f);
         }
+        else if (!hasResources)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1f, 1f, 1f, 1f);
+        }
         if (!isOccupied && !hasResources)
         {
             if (cooldownTimer < cooldown)
@@ -37,7 +41,7 @@ public class NeutralCamp : MonoBehaviour {
         }
 	}
 
-    void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerStay2D(Collider2D other)
     {
         if (other.gameObject != null)
         {

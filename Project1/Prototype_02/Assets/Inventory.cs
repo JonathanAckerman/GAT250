@@ -22,11 +22,28 @@ public class Inventory : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if (total <= 0 && !gameObject.GetComponent<CharacterController>().attackOrderActive)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
+        }
 	}
 
     void IncreaseTotal(int amount)
     {
         total += amount;
-        print(total);
+        if (total > 0)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+        }
+    }
+
+    public int GetTotal()
+    {
+        return total;
+    }
+
+    public void ShotOrb()
+    {
+        total -= 1;
     }
 }
