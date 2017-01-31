@@ -23,21 +23,28 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.mousePosition.x < 0.0f)
+        if (Input.mousePosition.x <= 20.0f)
         {
             transform.position += new Vector3(-1,0,0) * camMoveSpeed * Time.deltaTime;
         }
-        if (Input.mousePosition.x > panRightX * 2)
+        if (Input.mousePosition.x >= panRightX * 2 - 20)
         {
             transform.position += new Vector3(1, 0, 0) * camMoveSpeed * Time.deltaTime;
         }
-        if (Input.mousePosition.y > panUpY * 2)
+        if (Input.mousePosition.y >= panUpY * 2 - 20)
         {
             transform.position += new Vector3(0, 1, 0) * camMoveSpeed * Time.deltaTime;
         }
-        if (Input.mousePosition.y < 0.0f)
+        if (Input.mousePosition.y <= 20.0f)
         {
             transform.position += new Vector3(0, -1, 0) * camMoveSpeed * Time.deltaTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.F1))
+        {
+            Vector3 playerPos = playerRef.transform.position;
+            playerPos.z = transform.position.z;
+            transform.position = playerPos;
         }
     }
 }
