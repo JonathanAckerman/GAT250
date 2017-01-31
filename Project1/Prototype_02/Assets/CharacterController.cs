@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class CharacterController : MonoBehaviour {
@@ -11,6 +12,7 @@ public class CharacterController : MonoBehaviour {
     public bool attackOrderActive = false;
     public Camera cam;
     int score = 0;
+    public Text scoreText;
 
     public GameObject bulletPrefab;
     public Transform bulletSpawn;
@@ -20,6 +22,7 @@ public class CharacterController : MonoBehaviour {
     float collectionTimer = 0.0f;
     NeutralCamp CurCamp;
 
+
     // Events for player
     public delegate void CampDetection(int amount);
     public static event CampDetection CampCallbacks;
@@ -27,6 +30,7 @@ public class CharacterController : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        SetScoreText();
 	}
 	
 	// Update is called once per frame
@@ -135,10 +139,16 @@ public class CharacterController : MonoBehaviour {
     public void MadeShot()
     {
         score += 1;
+        SetScoreText();
     }
 
     public int GetScore()
     {
         return score;
+    }
+
+    void SetScoreText()
+    {
+        scoreText.text = "Score: " + score.ToString();
     }
 }
