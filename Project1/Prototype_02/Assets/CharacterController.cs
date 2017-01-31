@@ -116,7 +116,7 @@ public class CharacterController : MonoBehaviour {
     ////////////////////////////
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.name == "Neutral Camp")
+        if (other.gameObject.tag == "Neutral Camp")
         {
             CurCamp = other.gameObject.GetComponent<NeutralCamp>();
             isInsideCamp = true;
@@ -125,7 +125,7 @@ public class CharacterController : MonoBehaviour {
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.name == "Neutral Camp")
+        if (other.gameObject.tag == "Neutral Camp")
         {
             isInsideCamp = false;
             collectionTimer = 0.0f;
