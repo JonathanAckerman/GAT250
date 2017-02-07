@@ -5,7 +5,7 @@ public class BasicAI : MonoBehaviour {
     public GameObject playerRef;
     public GameObject hoopRef;
     float distToPlayer;
-    public float moveSpeed;
+    public float moveSpeed; //used for shuffle but when i rework the AI this shit is outie 5000
     public float aggroRange;
     public float deaggroRange;
     public float minDist;
@@ -14,11 +14,13 @@ public class BasicAI : MonoBehaviour {
     bool shuffleRight = true;
     float shuffleTime = 1.0f;
     float shuffleTimer = 0.0f;
+    public float ShoveSpeed;
+    public float PushBackDist;
+    public float StunDuration;
 
 	// Use this for initialization
 	void Start ()
     {
-	
 	}
 	
 	// Update is called once per frame
@@ -27,21 +29,20 @@ public class BasicAI : MonoBehaviour {
         Transform playerTransform = playerRef.GetComponent<Transform>();
         Transform hoopTransform = hoopRef.GetComponent<Transform>();
         Vector3 hoopToPlayer = playerTransform.position - hoopTransform.position;
-        hoopToPlayer.Scale(new Vector3(0.5f, 0.5f, 1.0f));
-        Vector3 dirVector = (hoopTransform.position + hoopToPlayer) - transform.position;
-
+        Vector3 halfDistVec = new Vector3(hoopToPlayer.x * 0.5f, hoopToPlayer.y * 0.5f, hoopToPlayer.z);
         distToPlayer = (playerTransform.position - transform.position).magnitude;
 	    if (distToPlayer < aggroRange)
         {
             shouldChase = true;
         }
-        if (distToPlayer > deaggroRange) //|| distToPlayer < minDist)
+        if (distToPlayer > deaggroRange) //|| distToPlayer < minDist) for minDist ie allowplayer to pass or avoid getting shoved
         {
             shouldChase = false;
         }
         if (shouldChase)
         {
-            ChasePlayer(dirVector);
+            gameObject.GetComponent<Moveable>().SetDestinationWithLook(hoopTransform.position + halfDistVec, hoopTransform.position + hoopToPlayer);
+            Shuffle();
         }
         //////////////////
         // Shuffle Timer
@@ -55,7 +56,7 @@ public class BasicAI : MonoBehaviour {
             shuffleRight = !shuffleRight;
             shuffleTimer = 0.0f;
         }
-	}
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -63,14 +64,17 @@ public class BasicAI : MonoBehaviour {
         {
             Destroy(other.gameObject);
         }
+        if (other.gameObject.tag == "Player")
+        {
+            Vector3 shoveTarget = (other.transform.position - transform.position).normalized;
+            shoveTarget.z = -1.0f;
+            shoveTarget.Scale(new Vector3(PushBackDist, PushBackDist, 0));
+            Moveable mover = other.gameObject.GetComponent<Moveable>();
+            mover.SetDestination(other.transform.position + shoveTarget, false);
+            mover.SetTemporarySpeed(ShoveSpeed, StunDuration);
+            other.GetComponent<Stunable>().StunTarget(other.gameObject, StunDuration);
+        }
     }
-
-    void ChasePlayer(Vector3 dir)
-    {
-        transform.position += dir.normalized * moveSpeed * Time.deltaTime;
-        Shuffle();
-    }
-
     void Shuffle()
     {
         Vector3 forward = playerRef.transform.position - transform.position;

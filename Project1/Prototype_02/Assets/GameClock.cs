@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -29,6 +30,7 @@ public class GameClock : MonoBehaviour {
         else
         {
             //Game End
+            SceneManager.LoadScene("GameOver");
         }
 	}
 

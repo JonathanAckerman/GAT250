@@ -16,7 +16,7 @@ public class ButtonLogic : MonoBehaviour {
     {
         Application.Quit();
     }
-    public void OnBack()
+    public void OnMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
     }

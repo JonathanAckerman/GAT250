@@ -85,7 +85,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdb1c8205aabbaa4fb8fe176f3b35bf4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  decayTime: 20
+  decayTime: 0.85
+  bulletColor: 0
 --- !u!212 &212000010835101552
 SpriteRenderer:
   m_ObjectHideFlags: 1

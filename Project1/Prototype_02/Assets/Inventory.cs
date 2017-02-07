@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Inventory : MonoBehaviour {
     int total = 0;
+    public Text inventoryText;
 
 	// Use this for initialization
 	void Start ()
     {
-	}
+        SetInventoryText();
+    }
 
     void OnEnable()
     {
@@ -24,17 +27,14 @@ public class Inventory : MonoBehaviour {
     {
         if (total <= 0 && !gameObject.GetComponent<CharacterController>().attackOrderActive)
         {
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
+            //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
         }
 	}
 
     void IncreaseTotal(int amount)
     {
         total += amount;
-        if (total > 0)
-        {
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
-        }
+        SetInventoryText();
     }
 
     public int GetTotal()
@@ -45,5 +45,11 @@ public class Inventory : MonoBehaviour {
     public void ShotOrb()
     {
         total -= 1;
+        SetInventoryText();
+    }
+
+    void SetInventoryText()
+    {
+        inventoryText.text = "Shots Left: " + total.ToString();
     }
 }

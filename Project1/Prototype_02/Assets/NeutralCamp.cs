@@ -2,50 +2,64 @@
 using System.Collections;
 
 public class NeutralCamp : MonoBehaviour {
-    public float timeToComplete;
-    public int resourceAmount;
     public float cooldown;
     float cooldownTimer = 0.0f;
     bool isOccupied = false;
-    public bool hasResources = false;
+    public NeutralCreep[] CreepList;
+    int creepListSize;
 
     // Use this for initialization
     void Start ()
     {
-
+        creepListSize = CreepList.GetLength(0);
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if (isOccupied && !hasResources)
+        if (!isOccupied)
         {
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 0, 0, 0.5f);
-        }
-        else if (!hasResources)
-        {
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1f, 1f, 1f, 1f);
-        }
-        if (!isOccupied && !hasResources)
-        {
-            if (cooldownTimer < cooldown)
+            if (CountEmptyCreeps() == creepListSize)
             {
-                cooldownTimer += Time.deltaTime;
-            }
-            else if (cooldownTimer >= cooldown && !isOccupied)
-            {
-                gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
-                cooldownTimer = 0.0f;
-                hasResources = true;
+                if (cooldownTimer < cooldown)
+                {
+                    cooldownTimer += Time.deltaTime;
+                }
+                else if (cooldownTimer >= cooldown)
+                {
+                    cooldownTimer = 0.0f;
+                    for (int i = 0; i < CreepList.GetLength(0); ++i)
+                    {
+                        CreepList[i].hasResources = true;
+                        CreepList[i].gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+                    }
+                }
             }
         }
-	}
+    }
+
+    int CountEmptyCreeps()
+    {
+        int count = 0;
+        for (int i = 0; i < CreepList.GetLength(0); ++i)
+        {
+            if (!CreepList[i].hasResources)
+            {
+                ++count;
+            }
+        }
+
+        return count;
+    }
 
     void OnTriggerStay2D(Collider2D other)
     {
         if (other.gameObject != null)
         {
-            isOccupied = true;
+            if (other.gameObject.tag != "Creep")
+            {
+                isOccupied = true;
+            }
         }
     }
 

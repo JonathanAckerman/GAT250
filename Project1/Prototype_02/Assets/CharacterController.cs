@@ -3,16 +3,18 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class CharacterController : MonoBehaviour {
-    float moveSpeed = 5.0f;
-    Vector3 newPos = new Vector3();
-    Vector3 dir;
-    float totalDist = 0.0f;
-    float curDist = 0.0f;
-    bool arrived = true;
     public bool attackOrderActive = false;
+    bool issuedAttack = false;
+    Vector3 attackTarget;
     public Camera cam;
     int score = 0;
+    ResourceColor curColorSelection = ResourceColor.Red;
     public Text scoreText;
+    public Image spellIcon1;
+
+    // holy fuck look at how bloated this file is getting kill me now pls
+    public Texture2D defaultCursor;
+    public Texture2D attackCursor;
 
     public GameObject bulletPrefab;
     public Transform bulletSpawn;
@@ -20,8 +22,7 @@ public class CharacterController : MonoBehaviour {
 
     bool isInsideCamp = false;
     float collectionTimer = 0.0f;
-    NeutralCamp CurCamp;
-
+    NeutralCreep CurCreep;
 
     // Events for player
     public delegate void CampDetection(int amount);
@@ -31,11 +32,25 @@ public class CharacterController : MonoBehaviour {
     void Start ()
     {
         SetScoreText();
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        SetSpellIcon(1);
+    }
+
+    // Update is called once per frame
+    void Update()
     {
+        //////////////////////////////////////////////////////////////////////////
+        // Color Selection, side note why the fuck didnt i write an input mgmr :(
+        //////////////////////////////////////////////////////////////////////////
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            curColorSelection += 1;
+            if (curColorSelection == ResourceColor.NUM_COLORS)
+            {
+                curColorSelection = 0;
+            }
+            SetSpellIcon(1);
+        }
+        SetCursorImage();
         ///////////
         // Quit
         ///////////
@@ -43,65 +58,81 @@ public class CharacterController : MonoBehaviour {
         {
             Application.Quit();
         }
-
         ///////////////////////
         // Movement
-        //////////////////////
-        // Listen for right clicks and set the destination and move increment
-        Vector3 curPos = gameObject.GetComponent<Transform>().position;
-        if (Input.GetMouseButtonDown(1))
+        ///////////////////////
+        if (!gameObject.GetComponent<Stunable>().GetStatus())
         {
-            arrived = false;
-            newPos = cam.ScreenToWorldPoint(Input.mousePosition);
-            newPos.z = curPos.z;
-            dir = newPos - curPos;
-            totalDist = dir.magnitude;
-            dir.Normalize();
-            dir.Scale(new Vector3(moveSpeed, moveSpeed, 1.0f));
-            curDist = 0.0f;
+            if (Input.GetMouseButtonDown(1))
+            {
+                Vector3 target = cam.ScreenToWorldPoint(Input.mousePosition);
+                target.z = transform.position.z;
+                gameObject.GetComponent<Moveable>().SetDestination(target);
+            }
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                attackOrderActive = false;
+                gameObject.GetComponent<Moveable>().StopMovement();
+                if (GetComponent<Inventory>().GetTotal() > 0)
+                {
+                    //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+                }
+                else
+                {
+                    //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
+                }
+            }
+            ////////////////////////
+            // Attack
+            /////////////////////////
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                attackOrderActive = true;
+            }
+            if (attackOrderActive && Input.GetMouseButtonDown(0))
+            {
+                issuedAttack = true;
+                attackOrderActive = false;
+                attackTarget = cam.ScreenToWorldPoint(Input.mousePosition);
+            }
+            if (issuedAttack)
+            {
+                gameObject.GetComponent<Moveable>().StopMovement();
+                bool isDoneRot = gameObject.GetComponent<Moveable>().RotateTowardsTarget(attackTarget);
+                if (isDoneRot)
+                {
+                    ShootAtTarget(attackTarget);
+                    issuedAttack = false;
+                }
+            }
         }
-        // Check if we have arrived at the destination so we dont over shoot
-        if (!arrived)
-        {
-            gameObject.GetComponent<Transform>().position += dir * Time.deltaTime;
-            curDist += dir.magnitude * Time.deltaTime;
-        }
-        // stop when we reach the destination
-        if (curDist >= totalDist)
-        {
-            arrived = true;
-            curDist = 0.0f;
-        }
-
-        ////////////////////////
-        // Attack
-        /////////////////////////
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            attackOrderActive = true;
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0.2f, 0.2f, 0.9f, 1);
-        }
-        if (attackOrderActive && Input.GetMouseButtonDown(0))
-        {
-            Vector3 target = cam.ScreenToWorldPoint(Input.mousePosition);
-            ShootAtTarget(target);
-            attackOrderActive = false;
-        }
-
         // Neutral Camp Logic
         if (isInsideCamp)
         {
-            if (CurCamp.hasResources)
+            if (CurCreep.hasResources)
             {
                 collectionTimer += Time.deltaTime;
-                //print(collectionTimer);
-                if (collectionTimer >= CurCamp.timeToComplete)
+                if (collectionTimer >= CurCreep.timeToComplete)
                 {
-                    CurCamp.hasResources = false;
+                    CurCreep.hasResources = false;
                     collectionTimer = 0.0f;
-                    CampCallbacks(CurCamp.resourceAmount);
+                    CampCallbacks(CurCreep.resourceAmount);
                 }
             }
+        }
+    }
+    ////////////////////
+    // Cursor shit
+    ////////////////////
+    void SetCursorImage()
+    {
+        if (attackOrderActive)
+        {
+            Cursor.SetCursor(attackCursor, new Vector2(), CursorMode.Auto);
+        }
+        else
+        {
+            Cursor.SetCursor(defaultCursor, new Vector2(), CursorMode.Auto);
         }
     }
 
@@ -115,11 +146,12 @@ public class CharacterController : MonoBehaviour {
         if (curTotal > 0)
         {
             GameObject bullet = (GameObject)Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+            bullet.GetComponent<BulletLogic>().bulletColor = curColorSelection;
             Vector3 dir = target - bulletSpawn.position;
             dir.z = bulletSpawn.position.z;
             bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletMoveSpeed;
             inventory.ShotOrb();
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+            //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
         }
     }
 
@@ -128,16 +160,16 @@ public class CharacterController : MonoBehaviour {
     ////////////////////////////
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Neutral Camp")
+        if (other.gameObject.tag == "Creep")
         {
-            CurCamp = other.gameObject.GetComponent<NeutralCamp>();
+            CurCreep = other.gameObject.GetComponent<NeutralCreep>();
             isInsideCamp = true;
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Neutral Camp")
+        if (other.gameObject.tag == "Creep")
         {
             isInsideCamp = false;
             collectionTimer = 0.0f;
@@ -154,7 +186,27 @@ public class CharacterController : MonoBehaviour {
     {
         return score;
     }
-
+    void SetSpellIcon(int spellNum)
+    {
+        // just end it now, this isnt real programming this is designer bullshit code
+        switch (spellNum)
+        {
+            case 1:
+                switch (curColorSelection)
+                {
+                    case ResourceColor.Red:
+                        spellIcon1.color = Color.red;
+                        break;
+                    case ResourceColor.Green:
+                        spellIcon1.color = Color.green;
+                        break;
+                    case ResourceColor.Blue:
+                        spellIcon1.color = Color.blue;
+                        break;
+                }
+                break;
+        }
+    }
     void SetScoreText()
     {
         scoreText.text = "Score: " + score.ToString();

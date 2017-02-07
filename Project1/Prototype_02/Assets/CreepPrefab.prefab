@@ -24,7 +24,7 @@ GameObject:
   - 50: {fileID: 50000012010036846}
   - 114: {fileID: 114000012132591650}
   m_Layer: 0
-  m_Name: Neutral Camp
+  m_Name: CreepPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,7 +87,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeToComplete: 5
   resourceAmount: 5
-  cooldown: 2
   hasResources: 0
 --- !u!212 &212000010157996848
 SpriteRenderer:
