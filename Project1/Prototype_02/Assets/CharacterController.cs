@@ -6,6 +6,13 @@ public class CharacterController : MonoBehaviour {
     public bool attackOrderActive = false;
     bool issuedAttack = false;
     Vector3 attackTarget;
+    float chargeAmount = 1.0f;
+    float chargeDelay = 0.5f;
+    float chargeTimer = 0.0f;
+    float chargeResetTimer = 5.0f;
+    float chargeResetDelay = 5.0f;
+    bool hasResetCharge = true;
+
     public Camera cam;
     int score = 0;
     ResourceColor curColorSelection = ResourceColor.Red;
@@ -38,6 +45,21 @@ public class CharacterController : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        ////////////////
+        // charge reset
+        ////////////////
+        if (chargeResetTimer < chargeResetDelay)
+        {
+            chargeResetTimer += Time.deltaTime;
+        }
+        else
+        {
+            if (!hasResetCharge)
+            {
+                chargeAmount = 1.0f;
+                hasResetCharge = true;
+            }
+        }
         //////////////////////////////////////////////////////////////////////////
         // Color Selection, side note why the fuck didnt i write an input mgmr :(
         //////////////////////////////////////////////////////////////////////////
@@ -73,21 +95,32 @@ public class CharacterController : MonoBehaviour {
             {
                 attackOrderActive = false;
                 gameObject.GetComponent<Moveable>().StopMovement();
-                if (GetComponent<Inventory>().GetTotal() > 0)
-                {
-                    //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
-                }
-                else
-                {
-                    //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
-                }
+                chargeAmount = 1.0f;
+                chargeTimer = 0.0f;
             }
             ////////////////////////
             // Attack
             /////////////////////////
-            if (Input.GetKeyDown(KeyCode.A))
+            if (Input.GetKey(KeyCode.A))
             {
                 attackOrderActive = true;
+                if (chargeTimer < chargeDelay)
+                {
+                    chargeTimer += Time.deltaTime;
+                }
+                else
+                {
+                    if (chargeAmount <= gameObject.GetComponent<Inventory>().GetTotal())
+                    {
+                        chargeAmount += Time.deltaTime;
+                    }
+                }
+            }
+            if (Input.GetKeyUp(KeyCode.A))
+            {
+                chargeTimer = 0.0f;
+                chargeResetTimer = 0.0f;
+                hasResetCharge = false;
             }
             if (attackOrderActive && Input.GetMouseButtonDown(0))
             {
@@ -146,12 +179,14 @@ public class CharacterController : MonoBehaviour {
         if (curTotal > 0)
         {
             GameObject bullet = (GameObject)Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+            bullet.GetComponent<BulletLogic>().ballSize = (int)Mathf.Floor(chargeAmount); // ugh why is this a float
             bullet.GetComponent<BulletLogic>().bulletColor = curColorSelection;
             Vector3 dir = target - bulletSpawn.position;
             dir.z = bulletSpawn.position.z;
             bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletMoveSpeed;
-            inventory.ShotOrb();
-            //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+            inventory.ShotOrb((int)Mathf.Floor(chargeAmount));
+            chargeTimer = 0.0f;
+            chargeAmount = 1.0f;
         }
     }
 
@@ -176,9 +211,9 @@ public class CharacterController : MonoBehaviour {
         }
     }
 
-    public void MadeShot()
+    public void MadeShot(int size)
     {
-        score += 1;
+        score += size;
         SetScoreText();
     }
 
@@ -210,5 +245,10 @@ public class CharacterController : MonoBehaviour {
     void SetScoreText()
     {
         scoreText.text = "Score: " + score.ToString();
+    }
+
+    public int GetChargeAmount()
+    {
+        return (int)Mathf.Floor(chargeAmount);
     }
 }

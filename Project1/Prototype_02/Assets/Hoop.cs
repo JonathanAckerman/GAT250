@@ -45,7 +45,7 @@ public class Hoop : MonoBehaviour {
                 {
                     // Point scored
                     Destroy(other.gameObject);
-                    playerRef.GetComponent<CharacterController>().MadeShot();
+                    playerRef.GetComponent<CharacterController>().MadeShot(other.GetComponent<BulletLogic>().ballSize); // dear fuck why is this on the player also i should have made a getter for ballsize not public
                     ++cooldownCounter;
 
                 }

@@ -26,35 +26,38 @@ public class BasicAI : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        Transform playerTransform = playerRef.GetComponent<Transform>();
-        Transform hoopTransform = hoopRef.GetComponent<Transform>();
-        Vector3 hoopToPlayer = playerTransform.position - hoopTransform.position;
-        Vector3 halfDistVec = new Vector3(hoopToPlayer.x * 0.5f, hoopToPlayer.y * 0.5f, hoopToPlayer.z);
-        distToPlayer = (playerTransform.position - transform.position).magnitude;
-	    if (distToPlayer < aggroRange)
+        if (!gameObject.GetComponent<Stunable>().GetStatus())
         {
-            shouldChase = true;
-        }
-        if (distToPlayer > deaggroRange) //|| distToPlayer < minDist) for minDist ie allowplayer to pass or avoid getting shoved
-        {
-            shouldChase = false;
-        }
-        if (shouldChase)
-        {
-            gameObject.GetComponent<Moveable>().SetDestinationWithLook(hoopTransform.position + halfDistVec, hoopTransform.position + hoopToPlayer);
-            Shuffle();
-        }
-        //////////////////
-        // Shuffle Timer
-        //////////////////
-        if (shuffleTimer < shuffleTime)
-        {
-            shuffleTimer += Time.deltaTime;
-        }
-        else
-        {
-            shuffleRight = !shuffleRight;
-            shuffleTimer = 0.0f;
+            Transform playerTransform = playerRef.GetComponent<Transform>();
+            Transform hoopTransform = hoopRef.GetComponent<Transform>();
+            Vector3 hoopToPlayer = playerTransform.position - hoopTransform.position;
+            Vector3 halfDistVec = new Vector3(hoopToPlayer.x * 0.5f, hoopToPlayer.y * 0.5f, hoopToPlayer.z);
+            distToPlayer = (playerTransform.position - transform.position).magnitude;
+            if (distToPlayer < aggroRange)
+            {
+                shouldChase = true;
+            }
+            if (distToPlayer > deaggroRange) //|| distToPlayer < minDist) for minDist ie allowplayer to pass or avoid getting shoved
+            {
+                shouldChase = false;
+            }
+            if (shouldChase)
+            {
+                gameObject.GetComponent<Moveable>().SetDestinationWithLook(hoopTransform.position + halfDistVec, hoopTransform.position + hoopToPlayer);
+                Shuffle();
+            }
+            //////////////////
+            // Shuffle Timer
+            //////////////////
+            if (shuffleTimer < shuffleTime)
+            {
+                shuffleTimer += Time.deltaTime;
+            }
+            else
+            {
+                shuffleRight = !shuffleRight;
+                shuffleTimer = 0.0f;
+            }
         }
     }
 
@@ -62,7 +65,16 @@ public class BasicAI : MonoBehaviour {
     {
         if (other.gameObject.tag == "Bullet")
         {
-            Destroy(other.gameObject);
+            //Destroy(other.gameObject);
+            gameObject.GetComponent<Moveable>().StopMovement();
+            gameObject.GetComponent<Stunable>().StunTarget(gameObject, other.GetComponent<BulletLogic>().ballSize / 2);
+            Vector2 reflectionVec = transform.position - playerRef.transform.position;
+            reflectionVec = reflectionVec - 2 * (Vector2.Dot(reflectionVec, playerRef.transform.right)) * new Vector2(playerRef.transform.right.x, playerRef.transform.right.y);
+            //reflectionVec = Vector2.Reflect(reflectionVec, transform.right);
+            other.gameObject.GetComponent<Rigidbody2D>().velocity = reflectionVec;
+            other.GetComponent<BulletLogic>().decayTime = 3.0f;
+            other.GetComponent<Rigidbody2D>().drag = 2.0f;
+            
         }
         if (other.gameObject.tag == "Player")
         {

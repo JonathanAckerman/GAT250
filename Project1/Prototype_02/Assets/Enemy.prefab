@@ -23,6 +23,7 @@ GameObject:
   - 50: {fileID: 50000011476285620}
   - 61: {fileID: 61000014174764464}
   - 114: {fileID: 114000010878345938}
+  - 114: {fileID: 114000014139674754}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -94,6 +95,17 @@ MonoBehaviour:
   ShoveSpeed: 0
   PushBackDist: 0
   StunDuration: 0
+--- !u!114 &114000014139674754
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010636417566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e105e4a832140c418a169d9fccc7e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &212000011877259982
 SpriteRenderer:
   m_ObjectHideFlags: 1

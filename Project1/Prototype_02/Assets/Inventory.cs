@@ -31,7 +31,7 @@ public class Inventory : MonoBehaviour {
         }
 	}
 
-    void IncreaseTotal(int amount)
+    public void IncreaseTotal(int amount)
     {
         total += amount;
         SetInventoryText();
@@ -42,9 +42,9 @@ public class Inventory : MonoBehaviour {
         return total;
     }
 
-    public void ShotOrb()
+    public void ShotOrb(int charge)
     {
-        total -= 1;
+        total -= charge;
         SetInventoryText();
     }
 

@@ -5,10 +5,15 @@ public class BulletLogic : MonoBehaviour {
     public float decayTime;
     float decayTimer = 0.0f;
     public ResourceColor bulletColor;
+    public GameObject playerRef;
+    int playerCollisionCounter = 0;
+    public int ballSize;
 
     // Use this for initialization
     void Start()
     {
+        playerRef = GameObject.FindGameObjectWithTag("Player");
+        Physics2D.IgnoreCollision(gameObject.GetComponent<CircleCollider2D>(), playerRef.GetComponent<Collider2D>());
         switch (bulletColor)
         {
             case ResourceColor.Red:
@@ -36,11 +41,19 @@ public class BulletLogic : MonoBehaviour {
         }
 	}
 
-    void OnCollisionEnter2D(Collision2D other)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.name == "Wall")
+        if (other.gameObject.name == "BallCollector")
         {
-            // bounce off wall
+            if (playerCollisionCounter > 0)
+            {
+                Destroy(other.gameObject);
+                playerRef.GetComponent<Inventory>().IncreaseTotal(ballSize);
+            }
+            else
+            {
+                ++playerCollisionCounter;
+            }
         }
     }
 }
