@@ -31,7 +31,7 @@ public class NeutralCamp : MonoBehaviour {
                     for (int i = 0; i < CreepList.GetLength(0); ++i)
                     {
                         CreepList[i].hasResources = true;
-                        CreepList[i].gameObject.GetComponent<SpriteRenderer>().color = new Vector4(0, 1, 0, 1);
+                        CreepList[i].gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
                     }
                 }
             }

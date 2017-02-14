@@ -48,7 +48,7 @@ public class BulletLogic : MonoBehaviour {
             if (playerCollisionCounter > 0)
             {
                 Destroy(other.gameObject);
-                playerRef.GetComponent<Inventory>().IncreaseTotal(ballSize);
+                //playerRef.GetComponent<Inventory>().IncreaseTotal(ballSize);
             }
             else
             {

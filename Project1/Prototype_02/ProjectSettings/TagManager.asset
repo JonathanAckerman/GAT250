@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Neutral Camp
   - Creep
+  - Wall
   layers:
   - Default
   - TransparentFX

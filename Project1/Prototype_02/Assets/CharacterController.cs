@@ -33,7 +33,7 @@ public class CharacterController : MonoBehaviour {
     NeutralCreep CurCreep;
 
     // Events for player
-    public delegate void CampDetection(int amount);
+    public delegate void CampDetection(int amount, ResourceColor color);
     public static event CampDetection CampCallbacks;
 
     // Use this for initialization
@@ -104,7 +104,7 @@ public class CharacterController : MonoBehaviour {
             ////////////////////////
             // Attack
             /////////////////////////
-            if (Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.R))
             {
                 attackOrderActive = true;
                 if (chargeTimer < chargeDelay)
@@ -113,14 +113,14 @@ public class CharacterController : MonoBehaviour {
                 }
                 else
                 {
-                    if (chargeAmount <= gameObject.GetComponent<Inventory>().GetTotal())
+                    if (chargeAmount <= gameObject.GetComponent<Inventory>().GetTotal(curColorSelection))
                     {
                         chargeAmount += Time.deltaTime;
                         barRef.SetActive(true);
                     }
                 }
             }
-            if (Input.GetKeyUp(KeyCode.A))
+            if (Input.GetKeyUp(KeyCode.R))
             {
                 chargeTimer = 0.0f;
                 chargeResetTimer = 0.0f;
@@ -153,7 +153,7 @@ public class CharacterController : MonoBehaviour {
                 {
                     CurCreep.hasResources = false;
                     collectionTimer = 0.0f;
-                    CampCallbacks(CurCreep.resourceAmount);
+                    CampCallbacks(CurCreep.resourceAmount, CurCreep.resourceColor);
                 }
             }
         }
@@ -179,7 +179,7 @@ public class CharacterController : MonoBehaviour {
     void ShootAtTarget(Vector3 target)
     {
         Inventory inventory = gameObject.GetComponent<Inventory>();
-        int curTotal = inventory.GetTotal();
+        int curTotal = inventory.GetTotal(curColorSelection);
         if (curTotal > 0)
         {
             GameObject bullet = (GameObject)Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
@@ -188,7 +188,7 @@ public class CharacterController : MonoBehaviour {
             Vector3 dir = target - bulletSpawn.position;
             dir.z = bulletSpawn.position.z;
             bullet.GetComponent<Rigidbody2D>().velocity = dir.normalized * bulletMoveSpeed;
-            inventory.ShotOrb((int)Mathf.Floor(chargeAmount));
+            inventory.ShotOrb((int)Mathf.Floor(chargeAmount), curColorSelection);
             chargeTimer = 0.0f;
             chargeAmount = 1.0f;
         }
@@ -212,6 +212,15 @@ public class CharacterController : MonoBehaviour {
         {
             isInsideCamp = false;
             collectionTimer = 0.0f;
+        }
+    }
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Wall")
+        {
+            Moveable move = GetComponent<Moveable>();
+            move.StopMovement();
+            transform.position += other.GetComponent<Wall>().normal * 0.01f;
         }
     }
 

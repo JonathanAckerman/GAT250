@@ -4,6 +4,7 @@ using System.Collections;
 public class NeutralCreep : MonoBehaviour {
     public float timeToComplete;
     public int resourceAmount;
+    public ResourceColor resourceColor;
     bool isOccupied = false;
     public bool hasResources = false;
 
@@ -22,7 +23,7 @@ public class NeutralCreep : MonoBehaviour {
         }
         else if (!hasResources)
         {
-            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1f, 1f, 1f, 1f);
+            gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1f, 1f, 1f, 0.4f);
         }
 	}
 

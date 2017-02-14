@@ -19,7 +19,7 @@ public class ChargeBar : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (playerRef.GetComponent<Inventory>().GetTotal() == 0)
+        if (playerRef.GetComponent<Inventory>().GetTotal(resColor) == 0)
         {
             barRef.SetActive(false);
         }
@@ -49,6 +49,6 @@ public class ChargeBar : MonoBehaviour {
 
     void SetBarText()
     {
-        chargeText.text = playerRef.GetComponent<CharacterController>().GetChargeAmount().ToString() + "/" + playerRef.GetComponent<Inventory>().GetTotal().ToString();
+        chargeText.text = playerRef.GetComponent<CharacterController>().GetChargeAmount().ToString() + "/" + playerRef.GetComponent<Inventory>().GetTotal(resColor).ToString();
     }
 }

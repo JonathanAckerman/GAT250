@@ -67,7 +67,7 @@ public class BasicAI : MonoBehaviour {
         {
             //Destroy(other.gameObject);
             gameObject.GetComponent<Moveable>().StopMovement();
-            gameObject.GetComponent<Stunable>().StunTarget(gameObject, other.GetComponent<BulletLogic>().ballSize / 2);
+            gameObject.GetComponent<Stunable>().StunTarget(gameObject, other.GetComponent<BulletLogic>().ballSize);
             Vector2 reflectionVec = transform.position - playerRef.transform.position;
             reflectionVec = reflectionVec - 2 * (Vector2.Dot(reflectionVec, playerRef.transform.right)) * new Vector2(playerRef.transform.right.x, playerRef.transform.right.y);
             //reflectionVec = Vector2.Reflect(reflectionVec, transform.right);

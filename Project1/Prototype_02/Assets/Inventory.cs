@@ -3,11 +3,15 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class Inventory : MonoBehaviour {
-    int total = 0;
-    public Text inventoryText;
+    int redTotal = 0;
+    int greenTotal = 0;
+    int blueTotal = 0;
+    public Text redText;
+    public Text greenText;
+    public Text blueText;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         SetInventoryText();
     }
@@ -25,31 +29,60 @@ public class Inventory : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (total <= 0 && !gameObject.GetComponent<CharacterController>().attackOrderActive)
-        {
-            //gameObject.GetComponent<SpriteRenderer>().color = new Vector4(1, 1, 1, 1);
-        }
 	}
 
-    public void IncreaseTotal(int amount)
+    public void IncreaseTotal(int amount, ResourceColor color)
     {
-        total += amount;
+        switch (color)
+        {
+            case ResourceColor.Red:
+                redTotal += amount;
+                break;
+            case ResourceColor.Green:
+                greenTotal += amount;
+                break;
+            case ResourceColor.Blue:
+                blueTotal += amount;
+                break;
+        }
         SetInventoryText();
     }
 
-    public int GetTotal()
+    public int GetTotal(ResourceColor color)
     {
-        return total;
+        switch (color)
+        {
+            case ResourceColor.Red:
+                return redTotal;
+            case ResourceColor.Green:
+                return greenTotal;
+            case ResourceColor.Blue:
+                return blueTotal;
+        }
+        return -1;
     }
 
-    public void ShotOrb(int charge)
+    public void ShotOrb(int charge, ResourceColor color)
     {
-        total -= charge;
+        switch (color)
+        {
+            case ResourceColor.Red:
+                redTotal -= charge;
+                break;
+            case ResourceColor.Green:
+                greenTotal -= charge;
+                break;
+            case ResourceColor.Blue:
+                blueTotal -= charge;
+                break;
+        }
         SetInventoryText();
     }
 
     void SetInventoryText()
     {
-        inventoryText.text = "Shots Left: " + total.ToString();
+        redText.text = redTotal.ToString();
+        greenText.text = greenTotal.ToString();
+        blueText.text = blueTotal.ToString();
     }
 }
