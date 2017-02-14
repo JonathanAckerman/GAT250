@@ -15,13 +15,14 @@ public class CharacterController : MonoBehaviour {
 
     public Camera cam;
     int score = 0;
-    ResourceColor curColorSelection = ResourceColor.Red;
+    public ResourceColor curColorSelection = ResourceColor.Red;
     public Text scoreText;
     public Image spellIcon1;
 
     // holy fuck look at how bloated this file is getting kill me now pls
     public Texture2D defaultCursor;
     public Texture2D attackCursor;
+    public GameObject barRef;
 
     public GameObject bulletPrefab;
     public Transform bulletSpawn;
@@ -58,6 +59,7 @@ public class CharacterController : MonoBehaviour {
             {
                 chargeAmount = 1.0f;
                 hasResetCharge = true;
+                barRef.SetActive(false);
             }
         }
         //////////////////////////////////////////////////////////////////////////
@@ -97,6 +99,7 @@ public class CharacterController : MonoBehaviour {
                 gameObject.GetComponent<Moveable>().StopMovement();
                 chargeAmount = 1.0f;
                 chargeTimer = 0.0f;
+                barRef.SetActive(false);
             }
             ////////////////////////
             // Attack
@@ -113,6 +116,7 @@ public class CharacterController : MonoBehaviour {
                     if (chargeAmount <= gameObject.GetComponent<Inventory>().GetTotal())
                     {
                         chargeAmount += Time.deltaTime;
+                        barRef.SetActive(true);
                     }
                 }
             }

@@ -3,9 +3,10 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class ChargeBar : MonoBehaviour {
-    public ResourceColor Color;
+    ResourceColor resColor;
     public Text chargeText;
     public Image chargeBackground;
+    public GameObject barRef;
     public GameObject playerRef;
 
 	// Use this for initialization
@@ -18,13 +19,32 @@ public class ChargeBar : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        SetBarColor();
-        SetBarText();
+        if (playerRef.GetComponent<Inventory>().GetTotal() == 0)
+        {
+            barRef.SetActive(false);
+        }
+        else
+        {
+            SetBarColor();
+            SetBarText();
+        }
     }
 
     void SetBarColor()
     {
-
+        resColor = playerRef.GetComponent<CharacterController>().curColorSelection;
+        switch (resColor)
+        {
+            case ResourceColor.Red:
+                chargeBackground.GetComponent<Image>().color = Color.red;
+                break;
+            case ResourceColor.Green:
+                chargeBackground.GetComponent<Image>().color = Color.green;
+                break;
+            case ResourceColor.Blue:
+                chargeBackground.GetComponent<Image>().color = Color.blue;
+                break;
+        }
     }
 
     void SetBarText()

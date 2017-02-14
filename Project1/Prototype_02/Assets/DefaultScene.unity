@@ -896,6 +896,7 @@ MonoBehaviour:
   spellIcon1: {fileID: 1659721029}
   defaultCursor: {fileID: 2800000, guid: 410a7fc46370dcc4fb3617eb25015094, type: 3}
   attackCursor: {fileID: 2800000, guid: ab9393ffd1c223c44bd2527130edc3de, type: 3}
+  barRef: {fileID: 1709430939}
   bulletPrefab: {fileID: 1000013325250870, guid: e3dfd3f86b2c87f4ba8239a59e65afe8,
     type: 2}
   bulletSpawn: {fileID: 720036330}
@@ -1823,9 +1824,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f18f396fc7cf9042a93f559d8bd8a64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Color: 0
+  resColor: 0
   chargeText: {fileID: 206459472}
   chargeBackground: {fileID: 1569331304}
+  barRef: {fileID: 1709430939}
   playerRef: {fileID: 720036325}
 --- !u!1 &1722324338
 GameObject:
